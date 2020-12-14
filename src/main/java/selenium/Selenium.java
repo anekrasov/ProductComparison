@@ -8,6 +8,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 public class Selenium {
     WebDriver driver;
 
+
     public Selenium() {
         System.setProperty("webdriver.chrome.driver", "chromedriver87");
         ChromeOptions chrome_options = new ChromeOptions();
@@ -19,4 +20,15 @@ public class Selenium {
     public WebDriver getDriver() {
         return driver;
     }
+
+//    public void waitForPageLoad(int time) {
+//        Wait<WebDriver> wait = new WebDriverWait(driver, time);
+//        wait.until(driver -> {
+//            System.out.println("Current Window State       : "
+//                    + ((JavascriptExecutor) driver).executeScript("return document.readyState"));
+//            return String.valueOf(((JavascriptExecutor) driver).executeScript("return document.readyState"))
+//                    .equals("complete");
+//        });
+//    }
 }
+
