@@ -1,5 +1,3 @@
 # Project exclude paths
 /target/
-chromedriver83
-chromedriver87
 .idea/
