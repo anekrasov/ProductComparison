@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.awt.image.AreaAveragingScaleFilter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -44,27 +45,35 @@ public class Auchan {
         ArrayList <String> urls = new ArrayList<>();
         JsonArray jsonArray = new Gson().fromJson(getHttpResponse(auchansiteCategoryes),JsonArray.class);
         for (JsonElement o: jsonArray) {
-            String name = o.getAsJsonObject().get("name").toString();
-//            System.out.println(name);
             JsonArray items = o.getAsJsonObject().getAsJsonArray("items");
             for (JsonElement o2: items ) {
                 String code = o2.getAsJsonObject().get("code").toString().replace("\"","");
                 String productsCount = o2.getAsJsonObject().get("productsCount").toString().replace("\"","");
                 urls.add("https://www.auchan.ru/v1/catalog/products?merchantId=65&filter[category]="+code+"&page=1&perPage="+productsCount+"&orderField=rank&orderDirection=asc");
-//                System.out.println(url);
             }
         }
         return urls;
     }
+
+    public ArrayList<String> getCategory(){
+        ArrayList<String> arrayList = new ArrayList<>();
+        JsonArray jsonArray = new Gson().fromJson(getHttpResponse(auchansiteCategoryes),JsonArray.class);
+        for (JsonElement o: jsonArray) {
+            arrayList.add(o.getAsJsonObject().get("name").toString());
+        }
+        return arrayList;
+    }
+
     public void getProduct(){
         ArrayList<String> urls = generateUrl();
-        for (String o : urls) {
-            String response = getHttpResponse(o);
+        for (String u : urls) {
+            String response = getHttpResponse(u);
             JsonElement items = new Gson().fromJson(response, JsonObject.class).get("items");
             for (JsonElement i: items.getAsJsonArray()) {
                 String title = i.getAsJsonObject().get("title").toString();
                 String priceValue = i.getAsJsonObject().get("price").getAsJsonObject().get("value").toString();
                 String priceCurrency = i.getAsJsonObject().get("price").getAsJsonObject().get("currency").toString();
+
                 System.out.println(title+" "+priceValue+priceCurrency);
             }
         }
