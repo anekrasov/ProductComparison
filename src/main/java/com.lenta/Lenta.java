@@ -54,7 +54,6 @@ public class Lenta {
         totalCount = jsonObject.get("totalCount").toString();
         if(totalCount!=null){
             int total = Integer.parseInt(totalCount);
-            System.out.println("всего: "+total);
             if(total>=1000){
                 int count = 0;
                 while (total>=1000){
@@ -125,12 +124,13 @@ public class Lenta {
         String code;
         JsonObject dataMenu = getJsonDataMenu();
         JsonArray allCategoryProduct = getCategoryProduct(dataMenu);
+        statement.execute("DELETE FROM lenta_category;");
+        statement.execute("DELETE FROM lenta_product;");
         for (JsonElement o: allCategoryProduct) {
             name = o.getAsJsonObject().get("name").toString();
             code = o.getAsJsonObject().get("code").toString();
             String sql = "INSERT INTO 'lenta_category' ('name', 'code') VALUES ('"+name+"', "+code+");";
             JsonObject product = getProduct(code);
-            System.out.println(name);
             statement.execute(sql);
             for (JsonElement p: product.getAsJsonArray("skus") ) {
                 String title = p.getAsJsonObject().get("title").toString().replace("'","");

@@ -91,22 +91,22 @@ public class Auchan {
         Statement statement = connection.createStatement();
         String cat;
         HashMap<String,String> mapAuchan = generateUrl();
+        statement.execute("DELETE FROM auchan_category;");
+        statement.execute("DELETE FROM auchan_product;");
         for (String category: mapAuchan.keySet()) {
             cat = category;
-            if (statement!=null){
-                try {
-                    statement.execute("INSERT INTO 'auchan_category' ('name') VALUES ('"+category+"');");
-                    HashMap<String,String> product = getProduct(mapAuchan.get(cat));
-                        for (String p: product.keySet()) {
-                            String name = p.replace("'","");
-                            String price = product.get(p).replace("'","");
-                            statement.execute("INSERT INTO 'auchan_product' ('name','price','category') VALUES ('"+name+"','"+price+"','"+cat+"');");
-                        }
+            try {
+                statement.execute("INSERT INTO 'auchan_category' ('name') VALUES ('"+category+"');");
+                HashMap<String,String> product = getProduct(mapAuchan.get(cat));
+                    for (String p: product.keySet()) {
+                        String name = p.replace("'","");
+                        String price = product.get(p).replace("'","");
+                        statement.execute("INSERT INTO 'auchan_product' ('name','price','category') VALUES ('"+name+"','"+price+"','"+cat+"');");
+                    }
 
-                } catch (SQLException throwables) {
-                    connection.close();
-                    throwables.printStackTrace();
-                }
+            } catch (SQLException throwables) {
+                connection.close();
+                throwables.printStackTrace();
             }
         }
     }
