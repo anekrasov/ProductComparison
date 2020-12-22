@@ -9,6 +9,7 @@ import database.Database;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -117,9 +118,10 @@ public class Lenta {
         return String.valueOf(jsonString);
     }
 
-    public void toDatabase() throws SQLException, ClassNotFoundException {
-        Connection conn = Database.conn();
-        Statement statement = conn.createStatement();
+    public void toDatabase() throws SQLException {
+        Database database = new Database();
+        Connection connection = database.getConn();
+        Statement statement = connection.createStatement();
         String name;
         String code;
         JsonObject dataMenu = getJsonDataMenu();
@@ -127,7 +129,7 @@ public class Lenta {
         for (JsonElement o: allCategoryProduct) {
             name = o.getAsJsonObject().get("name").toString();
             code = o.getAsJsonObject().get("code").toString();
-            String sql = "INSERT INTO 'lenta_category' ('productCategory', 'code') VALUES ('"+name+"', "+code+");";
+            String sql = "INSERT INTO 'lenta_category' ('name', 'code') VALUES ('"+name+"', "+code+");";
             JsonObject product = getProduct(code);
             System.out.println(name);
             statement.execute(sql);
@@ -135,8 +137,9 @@ public class Lenta {
                 String title = p.getAsJsonObject().get("title").toString().replace("'","");
                 String regularPrice = p.getAsJsonObject().get("regularPrice").getAsJsonObject().get("value").toString();
                 String cardPrice = p.getAsJsonObject().get("cardPrice").getAsJsonObject().get("value").toString();
-                String sqlproduct = "INSERT INTO 'lenta_product' ('name', 'price','price_card','category') " +
-                        "VALUES ('"+title+"', "+regularPrice+","+cardPrice+","+name+");";
+                String subTitle = p.getAsJsonObject().get("subTitle").toString();
+                String sqlproduct = "INSERT INTO 'lenta_product' ('name', 'price','price_card','category','sub_name') " +
+                        "VALUES ('"+title+"', "+regularPrice+","+cardPrice+","+name+","+subTitle+");";
 //                System.out.println(sqlproduct);
                 statement.execute(sqlproduct);
 //                System.out.println(title+" цена: " + regularPrice + " цена по карте: "+cardPrice);
@@ -144,8 +147,8 @@ public class Lenta {
 //            System.out.println(code);
 //            System.out.println(product);
         }
-        statement.close();
-        conn.close();
+//        if(statement!=null)statement.close();
+//        connection.close();
     }
 
 }

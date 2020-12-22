@@ -3,45 +3,73 @@ package database;
 import java.sql.*;
 
 public class Database {
-    public static Connection conn;
+    public static Connection conn = null;
     public static Statement statmt;
     public static ResultSet resSet;
 
-    public Database() {
+    // --------ПОДКЛЮЧЕНИЕ К БАЗЕ ДАННЫХ--------
+    private static void conn() {
         try {
-            conn();
-        } catch (ClassNotFoundException e) {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:product");
+            System.out.println("База Подключена!");
+            createTables();
+        }catch (Exception e){
+            System.out.println("База не подключена");
             e.printStackTrace();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
         }
     }
 
-    // --------ПОДКЛЮЧЕНИЕ К БАЗЕ ДАННЫХ--------
-    public static Connection conn() throws ClassNotFoundException, SQLException
-    {
-        conn = null;
-        Class.forName("org.sqlite.JDBC");
-        conn = DriverManager.getConnection("jdbc:sqlite:product");
-        System.out.println("База Подключена!");
+    public Connection getConn() {
+        conn();
         return conn;
     }
 
     // --------Создание таблицы--------
-    public static void createDB() throws SQLException
+    public static void createTables() throws SQLException
     {
+        String lenta_category = "CREATE TABLE if not exists \"lenta_category\" (\n" +
+                "\t\"id\"\tINTEGER,\n" +
+                "\t\"name\"\tTEXT UNIQUE,\n" +
+                "\t\"code\"\tTEXT UNIQUE,\n" +
+                "\tPRIMARY KEY(\"id\" AUTOINCREMENT)\n" +
+                ");";
+        String lenta_product = "CREATE TABLE if not exists \"lenta_product\" (\n" +
+                "\t\"id\"\tINTEGER,\n" +
+                "\t\"name\"\tTEXT,\n" +
+                "\t\"price\"\tTEXT,\n" +
+                "\t\"price_card\"\tTEXT,\n" +
+                "\t\"category\"\tTEXT,\n" +
+                "\t\"sub_name\"\tTEXT,\n" +
+                "\tFOREIGN KEY(\"category\") REFERENCES \"lenta_category\"(\"name\"),\n" +
+                "\tPRIMARY KEY(\"id\" AUTOINCREMENT)\n" +
+                ");";
+        String auchan_category = "CREATE TABLE if not exists \"auchan_category\" (\n" +
+                "\t\"id\"\tINTEGER,\n" +
+                "\t\"name\"\tTEXT UNIQUE,\n" +
+                "\tPRIMARY KEY(\"id\" AUTOINCREMENT)\n" +
+                ");";
+        String auchan_product ="CREATE TABLE if not exists \"auchan_product\" (\n" +
+                "\t\"id\"\tINTEGER,\n" +
+                "\t\"name\"\tTEXT,\n" +
+                "\t\"price\"\tTEXT,\n" +
+                "\t\"category\"\tTEXT,\n" +
+                "\tPRIMARY KEY(\"id\"),\n" +
+                "\tFOREIGN KEY(\"category\") REFERENCES \"auchan_category\"(\"name\")\n" +
+                ");";
+
         statmt = conn.createStatement();
-        statmt.execute("CREATE TABLE if not exists 'users' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'name' text, 'phone' INT);");
-        System.out.println("Таблица создана или уже существует.");
+        statmt.execute(lenta_category);
+        statmt.execute(lenta_product);
+        statmt.execute(auchan_category);
+        statmt.execute(auchan_product);
+        System.out.println("Таблицы созданы или уже существует.");
     }
 
     // --------Заполнение таблицы--------
-    public static void writeDB( ) throws SQLException
+    public static void writeDB(String sql ) throws SQLException
     {
-        statmt.execute("INSERT INTO 'lenta' ('productCategory', 'code') VALUES ('Petya', 125453); ");
-        statmt.execute("INSERT INTO 'users' ('name', 'phone') VALUES ('Vasya', 321789); ");
-        statmt.execute("INSERT INTO 'users' ('name', 'phone') VALUES ('Masha', 456123); ");
-
+        statmt.execute(sql);
         System.out.println("Таблица заполнена");
     }
 
@@ -70,12 +98,9 @@ public class Database {
         conn.close();
         statmt.close();
         resSet.close();
-
         System.out.println("Соединения закрыты");
     }
 
-    public static Connection getConn() {
-        return conn;
-    }
+
 }
 

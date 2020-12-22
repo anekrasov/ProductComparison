@@ -1,27 +1,34 @@
+import com.lenta.Lenta;
 import database.Database;
 import ru.auchan.Auchan;
 
+import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 
 public class MainApp {
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+    public static void main(String[] args) {
         System.out.println("load.....");
-        Auchan auchan = new Auchan();
-//        auchan.getProduct();
-        ArrayList<String> arrayList = auchan.getCategory();
-        Connection conn = Database.conn();
-        Statement statement = conn.createStatement();
-        String name;
-        for (String s: arrayList) {
-            name = s;
-            System.out.println(name);
-            statement.execute("INSERT INTO 'auchan_category' ('name') VALUES ('"+name+"');");
-        }
 
-        statement.close();
-        conn.close();
+        Auchan auchan = new Auchan();
+        Lenta lenta = new Lenta();
+
+        Thread thread1 = new Thread(() -> {
+            try {
+                auchan.toDatabase();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        });
+        Thread thread2 = new Thread(() -> {
+            try {
+                lenta.toDatabase();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        });
+        thread1.start();
+        thread2.start();
     }
 }
