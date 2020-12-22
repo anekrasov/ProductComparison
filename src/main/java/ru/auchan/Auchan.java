@@ -6,7 +6,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import database.Database;
 
-import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,7 +14,6 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Auchan {
@@ -74,15 +72,6 @@ public class Auchan {
         return category;
     }
 
-    public ArrayList<String> getCategory(){
-        ArrayList<String> arrayList = new ArrayList<>();
-        JsonArray jsonArray = new Gson().fromJson(getHttpResponse(auchansiteCategoryes),JsonArray.class);
-        for (JsonElement o: jsonArray) {
-            arrayList.add(o.getAsJsonObject().get("name").toString());
-        }
-        return arrayList;
-    }
-
     public HashMap<String,String> getProduct(String url){
         HashMap<String, String> product = new HashMap<>();
         String response = getHttpResponse(url);
@@ -120,7 +109,5 @@ public class Auchan {
                 }
             }
         }
-//        if(statement!=null)statement.close();
-//        connection.close();
     }
 }

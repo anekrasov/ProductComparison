@@ -5,7 +5,7 @@ import java.sql.*;
 public class Database {
     public static Connection conn = null;
     public static Statement statmt;
-    public static ResultSet resSet;
+
 
     // --------ПОДКЛЮЧЕНИЕ К БАЗЕ ДАННЫХ--------
     private static void conn() {
@@ -65,42 +65,5 @@ public class Database {
         statmt.execute(auchan_product);
         System.out.println("Таблицы созданы или уже существует.");
     }
-
-    // --------Заполнение таблицы--------
-    public static void writeDB(String sql ) throws SQLException
-    {
-        statmt.execute(sql);
-        System.out.println("Таблица заполнена");
-    }
-
-    // -------- Вывод таблицы--------
-    public static void readDB() throws SQLException
-    {
-        resSet = statmt.executeQuery("SELECT * FROM users");
-
-        while(resSet.next())
-        {
-            int id = resSet.getInt("id");
-            String  name = resSet.getString("name");
-            String  phone = resSet.getString("phone");
-            System.out.println( "ID = " + id );
-            System.out.println( "name = " + name );
-            System.out.println( "phone = " + phone );
-            System.out.println();
-        }
-
-        System.out.println("Таблица выведена");
-    }
-
-    // --------Закрытие--------
-    public static void closeDB() throws SQLException
-    {
-        conn.close();
-        statmt.close();
-        resSet.close();
-        System.out.println("Соединения закрыты");
-    }
-
-
 }
 

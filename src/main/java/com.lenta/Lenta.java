@@ -9,7 +9,6 @@ import database.Database;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -140,15 +139,10 @@ public class Lenta {
                 String subTitle = p.getAsJsonObject().get("subTitle").toString();
                 String sqlproduct = "INSERT INTO 'lenta_product' ('name', 'price','price_card','category','sub_name') " +
                         "VALUES ('"+title+"', "+regularPrice+","+cardPrice+","+name+","+subTitle+");";
-//                System.out.println(sqlproduct);
                 statement.execute(sqlproduct);
-//                System.out.println(title+" цена: " + regularPrice + " цена по карте: "+cardPrice);
+
             }
-//            System.out.println(code);
-//            System.out.println(product);
         }
-//        if(statement!=null)statement.close();
-//        connection.close();
     }
 
 }
