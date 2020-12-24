@@ -1,34 +1,27 @@
-import com.lenta.Lenta;
-import database.Database;
-import ru.auchan.Auchan;
-
-import javax.xml.crypto.Data;
-import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class MainApp {
     public static void main(String[] args) {
         System.out.println("load.....");
-
-        Auchan auchan = new Auchan();
-        Lenta lenta = new Lenta();
-
-        Thread thread1 = new Thread(() -> {
-            try {
-                auchan.toDatabase();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-        });
-        Thread thread2 = new Thread(() -> {
-            try {
-                lenta.toDatabase();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-        });
-        thread1.start();
-        thread2.start();
+        FillingDatabase.filling();
+//        try {
+//            ResultSet resultSetLenta = Comparison.getProduct("lenta","Walker");
+//            ResultSet resultSetAuchan = Comparison.getProduct("auchan","Walker");
+//            while (resultSetLenta.next()){
+//                String name = resultSetLenta.getString("name");
+//                String nameSubname = resultSetLenta.getString("sub_name");
+//                String price = resultSetLenta.getString("price");
+//                String price_card = resultSetLenta.getString("price_card");
+//                System.out.println("Lenta :"+name+"("+nameSubname+")"+"  "+price +" po karte :"+price_card);
+//            }
+//            while (resultSetAuchan.next()){
+//                String name = resultSetAuchan.getString("name");
+//                String price = resultSetAuchan.getString("price");
+//                System.out.println("Auchan: "+ name+"  "+price);
+//            }
+//        } catch (SQLException throwables) {
+//            throwables.printStackTrace();
+//        }
     }
 }

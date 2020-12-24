@@ -23,7 +23,7 @@ public class Auchan {
 
     public String getHttpResponse(String url){
         StringBuilder jsonString = new StringBuilder();
-        String userAgent = "YandexMobileBot";
+        String userAgent = "Yandex Mobile Bot";
         try {
             URL apiurl = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) apiurl.openConnection();
@@ -32,7 +32,17 @@ public class Auchan {
             connection.setRequestProperty("Accept", "application/json");
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             connection.setRequestProperty("Cookie", "_GASHOP=069_Barnaul_Volna; merchantID_=69; region_id=25");
-            BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            InputStreamReader inputStreamReader;
+            try {
+                inputStreamReader = new InputStreamReader(connection.getInputStream());
+            }catch (Exception e){
+                e.printStackTrace();
+                System.out.println("Auchan Thread sleep 60 sec");
+                Thread.sleep(60000);
+                System.out.println("resend");
+                inputStreamReader = new InputStreamReader(connection.getInputStream());
+            }
+            BufferedReader br = new BufferedReader(inputStreamReader);
             String line;
             while ((line = br.readLine()) != null) {
                 jsonString.append(line);
@@ -40,7 +50,7 @@ public class Auchan {
             br.close();
             connection.disconnect();
             return jsonString.toString();
-        }catch (IOException e) {
+        }catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
         return String.valueOf(jsonString);

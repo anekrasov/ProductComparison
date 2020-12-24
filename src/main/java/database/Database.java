@@ -6,8 +6,6 @@ public class Database {
     public static Connection conn = null;
     public static Statement statmt;
 
-
-    // --------ПОДКЛЮЧЕНИЕ К БАЗЕ ДАННЫХ--------
     private static void conn() {
         try {
             Class.forName("org.sqlite.JDBC");
@@ -25,7 +23,6 @@ public class Database {
         return conn;
     }
 
-    // --------Создание таблицы--------
     public static void createTables() throws SQLException
     {
         String lenta_category = "CREATE TABLE if not exists \"lenta_category\" (\n" +
@@ -37,10 +34,10 @@ public class Database {
         String lenta_product = "CREATE TABLE if not exists \"lenta_product\" (\n" +
                 "\t\"id\"\tINTEGER,\n" +
                 "\t\"name\"\tTEXT,\n" +
+                "\t\"sub_name\"\tTEXT,\n" +
                 "\t\"price\"\tTEXT,\n" +
                 "\t\"price_card\"\tTEXT,\n" +
                 "\t\"category\"\tTEXT,\n" +
-                "\t\"sub_name\"\tTEXT,\n" +
                 "\tFOREIGN KEY(\"category\") REFERENCES \"lenta_category\"(\"name\"),\n" +
                 "\tPRIMARY KEY(\"id\" AUTOINCREMENT)\n" +
                 ");";
