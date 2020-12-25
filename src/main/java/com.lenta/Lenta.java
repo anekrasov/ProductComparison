@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import database.Database;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import web.UserAgent;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -89,7 +90,7 @@ public class Lenta {
 
     public String getHttpRequest(String payload){
         StringBuilder jsonString = new StringBuilder();
-        String userAgent = "YandexMobileBot";
+        String userAgent = UserAgent.getRandomUserAgent();
         try {
             URL apiurl = new URL("https://lenta.com/api/v1/skus/list");
             HttpURLConnection connection = (HttpURLConnection) apiurl.openConnection();

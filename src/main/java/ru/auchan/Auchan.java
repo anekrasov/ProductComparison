@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import database.Database;
+import web.UserAgent;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,7 +24,7 @@ public class Auchan {
 
     public String getHttpResponse(String url){
         StringBuilder jsonString = new StringBuilder();
-        String userAgent = "Yandex Mobile Bot";
+        String userAgent = UserAgent.getRandomUserAgent();
         try {
             URL apiurl = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) apiurl.openConnection();
