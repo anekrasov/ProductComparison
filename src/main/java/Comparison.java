@@ -16,8 +16,7 @@ public class Comparison {
         Database database = new Database();
         Connection connection = database.getConn();
         Statement statement = connection.createStatement();
-        String sql = "SELECT \"_rowid_\",* FROM \"main\".\""+storeName+"\" WHERE \"name\" LIKE '%"+name+"%' ESCAPE '\\';";
-
+        String sql = "SELECT * FROM "+storeName+" WHERE \"name\" LIKE \"%"+name+"%\";";
         return statement.executeQuery(sql);
     }
 }

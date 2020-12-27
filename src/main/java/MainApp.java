@@ -22,14 +22,14 @@ public class MainApp {
                 String nameSubname = lentaResult.getString("sub_name");
                 String price = lentaResult.getString("price");
                 String price_card = lentaResult.getString("price_card");
-                String th = "<tr><td>"+name+" "+"("+nameSubname+")"+price +" po karte :"+price_card+"</td></tr>";
+                String th = "<tr><td>"+name+" "+nameSubname+"</td><td>"+price +"</td><td>"+price_card+"</td></tr>";
                 lenta = lenta + th;
-                System.out.println("Lenta :"+name+"("+nameSubname+")"+"  "+price +" po karte :"+price_card);
+//                System.out.println("Lenta :"+name+"("+nameSubname+")"+"  "+price +" po karte :"+price_card);
             }
             while (auchanResult.next()){
                 String name = auchanResult.getString("name");
                 String price = auchanResult.getString("price");
-                String th = "<tr><td>"+name+"  "+price +"</td></td>";
+                String th = "<tr><td>"+name+"</td><td>"+price +"</td></tr>";
                 auchan = auchan + th;
                 System.out.println("Auchan: "+ name+"  "+price);
             }
