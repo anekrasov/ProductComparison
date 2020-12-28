@@ -134,16 +134,16 @@ public class Lenta {
             JsonObject product = getProduct(code);
             statement.execute(sql);
             for (JsonElement p: product.getAsJsonArray("skus") ) {
-                String title = p.getAsJsonObject().get("title").toString().replace("'","");
+                String title = p.getAsJsonObject().get("title").toString().replace("'","").toLowerCase();
                 String regularPrice = p.getAsJsonObject().get("regularPrice").getAsJsonObject().get("value").toString();
                 String cardPrice = p.getAsJsonObject().get("cardPrice").getAsJsonObject().get("value").toString();
-                String subTitle = p.getAsJsonObject().get("subTitle").toString();
+                String subTitle = p.getAsJsonObject().get("subTitle").toString().toLowerCase();
                 String sqlproduct = "INSERT INTO 'lenta_product' ('name', 'price','price_card','category','sub_name') " +
                         "VALUES ('"+title+"', "+regularPrice+","+cardPrice+","+name+","+subTitle+");";
                 statement.execute(sqlproduct);
 
             }
         }
+        System.out.println("lenta filling complate");
     }
-
 }

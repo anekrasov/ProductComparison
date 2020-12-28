@@ -1,6 +1,7 @@
 import web.Web;
 
 import java.sql.ResultSet;
+import java.util.Locale;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
@@ -12,7 +13,7 @@ public class MainApp {
         get("/comparison", (req, res) -> Web.getPage("comparison.html"));
         get("/search", (req, res) -> "search!!");
         post("/search", (req, res) -> {
-            String text = req.queryParams("text");
+            String text = req.queryParams("text").toLowerCase();
             ResultSet lentaResult = Comparison.getProduct("lenta",text);
             ResultSet auchanResult = Comparison.getProduct("auchan",text);
             String lenta = "";
@@ -31,7 +32,7 @@ public class MainApp {
                 String price = auchanResult.getString("price");
                 String th = "<tr><td>"+name+"</td><td>"+price +"</td></tr>";
                 auchan = auchan + th;
-                System.out.println("Auchan: "+ name+"  "+price);
+//                System.out.println("Auchan: "+ name+"  "+price);
             }
             return Web.getPage("comparison.html", lenta, auchan);
         });

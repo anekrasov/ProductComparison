@@ -10,10 +10,10 @@ public class Database {
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:product");
-            System.out.println("База Подключена!");
+//            System.out.println("База Подключена!");
             createTables();
         }catch (Exception e){
-            System.out.println("База не подключена");
+//            System.out.println("База не подключена");
             e.printStackTrace();
         }
     }
@@ -60,7 +60,7 @@ public class Database {
         statmt.execute(lenta_product);
         statmt.execute(auchan_category);
         statmt.execute(auchan_product);
-        System.out.println("Таблицы созданы или уже существует.");
+//        System.out.println("Таблицы созданы или уже существует.");
     }
 }
 

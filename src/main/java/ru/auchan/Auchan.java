@@ -110,8 +110,8 @@ public class Auchan {
                 statement.execute("INSERT INTO 'auchan_category' ('name') VALUES ('"+category+"');");
                 HashMap<String,String> product = getProduct(mapAuchan.get(cat));
                     for (String p: product.keySet()) {
-                        String name = p.replace("'","");
-                        String price = product.get(p).replace("'","");
+                        String name = p.replace("'","").toLowerCase();
+                        String price = product.get(p).replace("'","").replace("\"RUB\"","");
                         statement.execute("INSERT INTO 'auchan_product' ('name','price','category') VALUES ('"+name+"','"+price+"','"+cat+"');");
                     }
 
@@ -120,5 +120,6 @@ public class Auchan {
                 throwables.printStackTrace();
             }
         }
+        System.out.println("auchan filling complete");
     }
 }
