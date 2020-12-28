@@ -62,12 +62,24 @@ public class Database {
                 "\tPRIMARY KEY(\"id\" AUTOINCREMENT)\n" +
                 ");";
 
+        String metrocc_product = "CREATE TABLE if not exists \"metrocc_product\" (\n" +
+                "\t\"id\"\tINTEGER,\n" +
+                "\t\"name\"\tTEXT,\n" +
+                "\t\"id_category\"\tTEXT,\n" +
+                "\t\"price\"\tTEXT,\n" +
+                "\t\"proce_opt\"\tTEXT,\n" +
+                "\t\"opt_count\"\tTEXT,\n" +
+                "\t\"stock\"\tTEXT,\n" +
+                "\tPRIMARY KEY(\"id\" AUTOINCREMENT)\n" +
+                ");";
+
         statmt = conn.createStatement();
         statmt.execute(lenta_category);
         statmt.execute(lenta_product);
         statmt.execute(auchan_category);
         statmt.execute(auchan_product);
         statmt.execute(metrocc_category);
+        statmt.execute(metrocc_product);
 //        System.out.println("Таблицы созданы или уже существует.");
     }
 }
