@@ -55,11 +55,19 @@ public class Database {
                 "\tFOREIGN KEY(\"category\") REFERENCES \"auchan_category\"(\"name\")\n" +
                 ");";
 
+        String metrocc_category ="CREATE TABLE if not exists \"metrocc_category\" (\n" +
+                "\t\"id\"\tINTEGER,\n" +
+                "\t\"name\"\tTEXT,\n" +
+                "\t\"site_id\"\tTEXT UNIQUE,\n" +
+                "\tPRIMARY KEY(\"id\" AUTOINCREMENT)\n" +
+                ");";
+
         statmt = conn.createStatement();
         statmt.execute(lenta_category);
         statmt.execute(lenta_product);
         statmt.execute(auchan_category);
         statmt.execute(auchan_product);
+        statmt.execute(metrocc_category);
 //        System.out.println("Таблицы созданы или уже существует.");
     }
 }
