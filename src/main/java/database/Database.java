@@ -69,7 +69,7 @@ public class Database {
                 "\t\"price\"\tTEXT,\n" +
                 "\t\"proce_opt\"\tTEXT,\n" +
                 "\t\"opt_count\"\tTEXT,\n" +
-                "\t\"stock\"\tTEXT,\n" +
+                "\t\"packing\"\tTEXT,\n" +
                 "\tPRIMARY KEY(\"id\" AUTOINCREMENT)\n" +
                 ");";
 
