@@ -121,5 +121,7 @@ public class Auchan {
             }
         }
         System.out.println("auchan filling complete");
+//        statement.close();
+//        connection.close();
     }
 }

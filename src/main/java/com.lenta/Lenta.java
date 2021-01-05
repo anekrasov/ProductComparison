@@ -145,5 +145,7 @@ public class Lenta {
             }
         }
         System.out.println("lenta filling complate");
+//        statement.close();
+//        connection.close();
     }
 }

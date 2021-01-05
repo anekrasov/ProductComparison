@@ -11,6 +11,7 @@ public class Comparison {
         String storeName = switch (store) {
             case "lenta" -> "lenta_product";
             case "auchan" -> "auchan_product";
+            case "metrocc" -> "metrocc_product";
             default -> null;
         };
         Database database = new Database();

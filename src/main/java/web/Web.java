@@ -19,7 +19,7 @@ public class Web {
             return contents;
         }
     }
-    public static String getPage(String page,String lenta,String auchan) {
+    public static String getPage(String page,String lenta,String auchan,String metrocc) {
         ClassLoader classLoader = Web.class.getClassLoader();
         File file = new File(Objects.requireNonNull(classLoader.getResource(page)).getFile());
         String contents = null;
@@ -27,6 +27,7 @@ public class Web {
             contents = Files.readString(file.toPath(), StandardCharsets.UTF_8);
             contents = contents.replace("%lenta%",lenta);
             contents = contents.replace("%auchan%",auchan);
+            contents = contents.replace("%metrocc%",metrocc);
             return contents;
         } catch (IOException ex) {
             return contents;

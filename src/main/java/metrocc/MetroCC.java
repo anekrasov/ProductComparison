@@ -19,10 +19,10 @@ import java.sql.Statement;
 
 public class MetroCC {
 
-    String metroccCategoryurl = "https://api.metro-cc.ru/api/v1/C98BB1B547ECCC17D8AEBEC7116D6/57/categories";
+    String getMetroccCategoryTree = "https://api.metro-cc.ru/api/v1/C98BB1B547ECCC17D8AEBEC7116D6/57/categories/tree";
     static Gson gson = new Gson();
 
-    public static String getHttpResponse(String url){
+    public static String getHttpResponse(String url) {
         StringBuilder jsonString = new StringBuilder();
         String userAgent = UserAgent.getRandomUserAgent();
         try {
@@ -36,7 +36,7 @@ public class MetroCC {
             InputStreamReader inputStreamReader;
             try {
                 inputStreamReader = new InputStreamReader(connection.getInputStream());
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println("MetroCC Thread sleep 60 sec");
                 Thread.sleep(60000);
@@ -51,40 +51,42 @@ public class MetroCC {
             br.close();
             connection.disconnect();
             return jsonString.toString();
-        }catch (IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
         return String.valueOf(jsonString);
     }
 
-    public JsonObject getProduct(String id){
+    public JsonObject getProduct(String id) {
         JsonObject jsonObject = null;
         String paginate;
-        String urltotal = "https://api.metro-cc.ru/api/v1/C98BB1B547ECCC17D8AEBEC7116D6/57/products?category_id[]D="+id+"";
-        paginate = gson.fromJson(getHttpResponse(urltotal),JsonObject.class).get("data").getAsJsonObject().get("total").toString();
+        String urltotal = "https://api.metro-cc.ru/api/v1/C98BB1B547ECCC17D8AEBEC7116D6/57/products?category_id[]D=" + id + "";
+        paginate = gson.fromJson(getHttpResponse(urltotal), JsonObject.class).get("data").getAsJsonObject().get("total").toString();
         int paginateInt = Integer.parseInt(paginate);
         String url;
-        if(paginateInt>=100){
-            while (paginateInt>=100){
+        if (paginateInt >= 100) {
+            while (paginateInt >= 100) {
                 paginateInt = paginateInt - 100;
-                url = "https://api.metro-cc.ru/api/v1/C98BB1B547ECCC17D8AEBEC7116D6/57/products?category_id[]D="+id+"&paginate=100";
-                JsonObject tmpJsonObject =  gson.fromJson(getHttpResponse(url),JsonObject.class);
-                if(jsonObject==null){
+                url = "https://api.metro-cc.ru/api/v1/C98BB1B547ECCC17D8AEBEC7116D6/57/products?category_id[]D=" + id + "&paginate=100";
+                JsonObject tmpJsonObject = gson.fromJson(getHttpResponse(url), JsonObject.class);
+                if (jsonObject == null) {
                     jsonObject = tmpJsonObject;
+                } else {
+                    String outMerge = JsonMerge.merge(jsonObject.toString(), tmpJsonObject.toString());
+                    jsonObject = gson.fromJson(outMerge, JsonObject.class);
                 }
-                String outMerge = JsonMerge.merge(jsonObject.toString(),tmpJsonObject.toString());
-                jsonObject = gson.fromJson(outMerge,JsonObject.class);
-//                System.out.println("Wheel :"+url);
             }
-            if(paginateInt>0){
-                url = "https://api.metro-cc.ru/api/v1/C98BB1B547ECCC17D8AEBEC7116D6/57/products?category_id[]D="+id+"&paginate="+paginateInt+"";
-                jsonObject = gson.fromJson(getHttpResponse(url),JsonObject.class);
+            if (paginateInt > 0) {
+                url = "https://api.metro-cc.ru/api/v1/C98BB1B547ECCC17D8AEBEC7116D6/57/products?category_id[]D=" + id + "&paginate=" + paginateInt + "";
+                JsonObject tmp = gson.fromJson(getHttpResponse(url), JsonObject.class);
+                String outMerge = JsonMerge.merge(jsonObject.toString(), tmp.toString());
+                jsonObject = gson.fromJson(outMerge, JsonObject.class);
+                return jsonObject;
             }
-            return jsonObject;
         }
-        if(paginateInt>0){
-            url = "https://api.metro-cc.ru/api/v1/C98BB1B547ECCC17D8AEBEC7116D6/57/products?category_id[]D="+id+"&paginate="+paginateInt+"";
-            jsonObject = gson.fromJson(getHttpResponse(url),JsonObject.class);
+        if (paginateInt > 0) {
+            url = "https://api.metro-cc.ru/api/v1/C98BB1B547ECCC17D8AEBEC7116D6/57/products?category_id[]D=" + id + "&paginate=" + paginateInt + "";
+            jsonObject = gson.fromJson(getHttpResponse(url), JsonObject.class);
             return jsonObject;
         }
         return jsonObject;
@@ -98,52 +100,74 @@ public class MetroCC {
         statement = connection.createStatement();
         statement.execute("DELETE FROM metrocc_category;");
         statement.execute("DELETE FROM metrocc_product;");
-        String url = metroccCategoryurl;
-        JsonObject jsonObjectCategory = gson.fromJson(getHttpResponse(url), JsonObject.class);
+        JsonObject jsonObjectCategory = gson.fromJson(getHttpResponse(getMetroccCategoryTree), JsonObject.class);
         for (JsonElement o : jsonObjectCategory.get("data").getAsJsonArray()) {
-            String name = o.getAsJsonObject().get("name").toString().toLowerCase();
-            String id = o.getAsJsonObject().get("id").toString();
-            statement.execute("INSERT INTO 'metrocc_category' ('name','site_id') VALUES ('" + name + "','" + id + "');");
-            JsonObject jsonObjectProduct= getProduct(id);
-            if(jsonObjectProduct!=null){
-                for (JsonElement jp: jsonObjectProduct.get("data").getAsJsonObject().get("data").getAsJsonArray()) {
-                    String outOfStock = jp.getAsJsonObject().get("stock").getAsJsonObject().get("text").getAsString();
-                    if(!outOfStock.equals("Отсутствует")){
-                        String nameProduct = jp.getAsJsonObject().get("name").getAsString().replace("'","").toLowerCase();
-                        String categoryId = jp.getAsJsonObject().get("category_id").getAsString();
-                        String price = jp.getAsJsonObject().get("prices").getAsJsonObject().get("price").getAsString();
-                        String packing = jp.getAsJsonObject().get("packing").getAsJsonObject().get("type").getAsString();
-                        String sql =
-                                "INSERT INTO 'metrocc_product' ('name','id_category','price','packing') VALUES ('" + nameProduct
-                                + "','" + categoryId +"','"+ price + "','"+packing+"');";
-                        try {
-                            JsonArray priceLevels = jp.getAsJsonObject().get("prices").getAsJsonObject().get("levels").getAsJsonArray();
-                            if (priceLevels!=null){
-                                String priceOpt;
-                                for (JsonElement priceopt: priceLevels) {
-                                    String count = priceopt.getAsJsonObject().get("count").toString();
-                                    priceOpt = priceopt.getAsJsonObject().get("price").toString();
-                                    String sql_opt =
-                                            "INSERT INTO 'metrocc_product' ('name','id_category','price','price_opt', 'opt_count') " +
-                                                    "VALUES ('"+nameProduct+"','"+categoryId+"','"+price+"','"+count+");";
-                                    statement.execute(sql_opt);
-                                    System.out.println("Product "+nameProduct+" Цена : "+price+" Цена в опте :"+priceOpt+" за "+ count);
-                                }
+            for (JsonElement subCategory : o.getAsJsonObject().get("childs").getAsJsonArray()) {
+                String name = subCategory.getAsJsonObject().get("name").toString().toLowerCase();
+                String id = subCategory.getAsJsonObject().get("id").toString();
+                statement.execute("INSERT INTO 'metrocc_category' ('name','site_id') VALUES ('" + name + "','" + id + "');");
+                JsonObject jsonObjectProduct = null;
+                try {
+                    jsonObjectProduct = getProduct(id);
+                } catch (NullPointerException e) {
+                    System.out.println("Касяк!!! в получении продуктов по id");
+                }
+                if (jsonObjectProduct != null) {
+                    JsonArray jsonArray = jsonObjectProduct.get("data").getAsJsonObject().get("data").getAsJsonArray();
+                    jsonArrayToDatabase(jsonArray, statement);
+                } else {
+                    try {
+                        JsonArray subLevel2 = subCategory.getAsJsonObject().get("childs").getAsJsonArray();
+                        for (JsonElement sl2 : subLevel2) {
+                            String subLevel2name = sl2.getAsJsonObject().get("name").toString().toLowerCase();
+                            String subLevel2id = sl2.getAsJsonObject().get("id").toString();
+                            statement.execute("INSERT INTO 'metrocc_category' ('name','site_id') VALUES ('" + subLevel2name + "','" + subLevel2id + "');");
+                            jsonObjectProduct = getProduct(subLevel2id);
+                            if (jsonObjectProduct != null) {
+                                JsonArray jsonArray = jsonObjectProduct.get("data").getAsJsonObject().get("data").getAsJsonArray();
+                                jsonArrayToDatabase(jsonArray, statement);
                             }
-                        }catch (Exception e){
-                            statement.execute(sql);
-                            System.out.println("Товар не оптовый");
                         }
-//                        System.out.println(jp);
-                    }else {
-                        System.out.println("Товара нет в Барнауле");
+                    } catch (NullPointerException e) {
+                        System.out.println("КАСЯК!!! в категории" + id + " (" + name + ")");
                     }
-
-//                    System.out.println("категория "+name + "товар" + jp.getAsJsonObject().get("name"));
                 }
             }
+        }
+        System.out.println("metrocc filling complate");
+//        statement.close();
+//        connection.close();
+    }
 
-            System.out.println("Категоря "+name + " " + id+" пуста");
+    public void jsonArrayToDatabase(JsonArray jsonArray, Statement statement) throws SQLException {
+        for (JsonElement jp : jsonArray) {
+            String outOfStock = jp.getAsJsonObject().get("stock").getAsJsonObject().get("text").getAsString();
+            if (!outOfStock.equals("Отсутствует")) {
+                String nameProduct = jp.getAsJsonObject().get("name").getAsString().replace("'", "").toLowerCase();
+                String categoryId = jp.getAsJsonObject().get("category_id").getAsString();
+                String price = jp.getAsJsonObject().get("prices").getAsJsonObject().get("price").getAsString();
+                String packing = jp.getAsJsonObject().get("packing").getAsJsonObject().get("type").getAsString();
+                String sql =
+                        "INSERT INTO 'metrocc_product' ('name','id_category','price','packing') VALUES ('" + nameProduct
+                                + "','" + categoryId + "','" + price + "','" + packing + "');";
+                try {
+                    JsonArray priceLevels = jp.getAsJsonObject().get("prices").getAsJsonObject().get("levels").getAsJsonArray();
+                    if (priceLevels != null) {
+                        String priceOpt;
+                        for (JsonElement priceopt : priceLevels) {
+                            String count = priceopt.getAsJsonObject().get("count").toString();
+                            priceOpt = priceopt.getAsJsonObject().get("price").toString();
+                            String sql_opt =
+                                    "INSERT INTO 'metrocc_product' ('name','id_category','price','price_opt', 'opt_count','packing') " +
+                                            "VALUES ('" + nameProduct + "','" + categoryId + "','" + price + "','" + priceOpt + "','" + count + "','" + packing + "');";
+                            statement.execute(sql_opt);
+                        }
+                    }
+                } catch (Exception e) {
+                    statement.execute(sql);
+                }
+            }
         }
     }
+
 }
