@@ -1,10 +1,6 @@
-import metrocc.MetroCC;
 import web.Web;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Locale;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
@@ -31,14 +27,12 @@ public class MainApp {
                 String price_card = lentaResult.getString("price_card");
                 String th = "<tr><td>"+name+" "+nameSubname+"</td><td>"+price +"</td><td>"+price_card+"</td></tr>";
                 lenta = lenta + th;
-//                System.out.println("Lenta :"+name+"("+nameSubname+")"+"  "+price +" po karte :"+price_card);
             }
             while (auchanResult.next()){
                 String name = auchanResult.getString("name");
                 String price = auchanResult.getString("price");
                 String th = "<tr><td>"+name+"</td><td>"+price +"</td></tr>";
                 auchan = auchan + th;
-//                System.out.println("Auchan: "+ name+"  "+price);
             }
             while (metroccResult.next()){
                 String name = metroccResult.getString("name");
@@ -47,7 +41,6 @@ public class MainApp {
                 String opt_count = metroccResult.getString("opt_count");
                 String th = "<tr><td>"+name+"</td><td>"+price +"</td><td>"+price_opt+"</td><td>"+opt_count+"</td></tr>";
                 metrocc = metrocc + th;
-//                System.out.println("Auchan: "+ name+"  "+price);
             }
             return Web.getPage("comparison.html", lenta, auchan, metrocc);
         });

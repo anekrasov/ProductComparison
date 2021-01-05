@@ -82,7 +82,5 @@ public class Database {
         statmt.execute(metrocc_product);
 //        System.out.println("Таблицы созданы или уже существует.");
     }
-    interface toDatabase{};
-
 }
 

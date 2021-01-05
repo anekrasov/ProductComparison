@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import database.Database;
 import web.UserAgent;
 
+import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,7 +18,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 
-public class Auchan {
+public class Auchan extends Database {
 
     String auchansiteCategoryes = "https://www.auchan.ru/v1/categories/?merchant_id=65";
 
@@ -114,7 +115,6 @@ public class Auchan {
                         String price = product.get(p).replace("'","").replace("\"RUB\"","");
                         statement.execute("INSERT INTO 'auchan_product' ('name','price','category') VALUES ('"+name+"','"+price+"','"+cat+"');");
                     }
-
             } catch (SQLException throwables) {
                 connection.close();
                 throwables.printStackTrace();

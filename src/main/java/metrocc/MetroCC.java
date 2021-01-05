@@ -17,7 +17,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class MetroCC {
+public class MetroCC{
 
     String getMetroccCategoryTree = "https://api.metro-cc.ru/api/v1/C98BB1B547ECCC17D8AEBEC7116D6/57/categories/tree";
     static Gson gson = new Gson();
@@ -93,7 +93,7 @@ public class MetroCC {
     }
 
 
-    public void toDatabase() throws SQLException {
+    public void toDatabase()throws SQLException {
         Database database = new Database();
         Connection connection = database.getConn();
         Statement statement;
