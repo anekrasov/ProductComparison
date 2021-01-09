@@ -3,6 +3,7 @@ package database;
 import java.sql.*;
 
 public class Database {
+
     public static Connection conn = null;
     public static Statement statmt;
 
@@ -10,6 +11,7 @@ public class Database {
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:product");
+            conn.setAutoCommit(false);
 //            System.out.println("База Подключена!");
             createTables();
         }catch (Exception e){
@@ -80,7 +82,10 @@ public class Database {
         statmt.execute(auchan_product);
         statmt.execute(metrocc_category);
         statmt.execute(metrocc_product);
+        conn.commit();
 //        System.out.println("Таблицы созданы или уже существует.");
     }
+
+
 }
 

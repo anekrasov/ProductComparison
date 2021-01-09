@@ -7,18 +7,18 @@ import com.google.gson.JsonObject;
 import database.Database;
 import web.UserAgent;
 
-import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 
-public class Auchan extends Database {
+public class Auchan {
 
     String auchansiteCategoryes = "https://www.auchan.ru/v1/categories/?merchant_id=65";
 
@@ -98,30 +98,38 @@ public class Auchan extends Database {
     }
 
     public void toDatabase() throws SQLException {
+        String cat;
+        HashMap<String,String> mapAuchan = generateUrl();
         Database database = new Database();
         Connection connection = database.getConn();
         Statement statement = connection.createStatement();
-        String cat;
-        HashMap<String,String> mapAuchan = generateUrl();
+        PreparedStatement psCategory = connection.prepareStatement("INSERT INTO 'auchan_category' ('name') VALUES (?);");
+        PreparedStatement psProduct = connection.prepareStatement("INSERT INTO auchan_product (name,price,category) VALUES (?, ?, ?);");
         statement.execute("DELETE FROM auchan_category;");
         statement.execute("DELETE FROM auchan_product;");
+        connection.commit();
         for (String category: mapAuchan.keySet()) {
             cat = category;
             try {
-                statement.execute("INSERT INTO 'auchan_category' ('name') VALUES ('"+category+"');");
+                psCategory.setString(1,category);
+                psCategory.addBatch();
                 HashMap<String,String> product = getProduct(mapAuchan.get(cat));
                     for (String p: product.keySet()) {
                         String name = p.replace("'","").toLowerCase();
                         String price = product.get(p).replace("'","").replace("\"RUB\"","");
-                        statement.execute("INSERT INTO 'auchan_product' ('name','price','category') VALUES ('"+name+"','"+price+"','"+cat+"');");
+                        psProduct.setString(1,name);
+                        psProduct.setString(2,price);
+                        psProduct.setString(3,cat);
+                        psProduct.addBatch();
                     }
             } catch (SQLException throwables) {
                 connection.close();
                 throwables.printStackTrace();
             }
         }
+        psCategory.executeBatch();
+        psProduct.executeBatch();
+        connection.commit();
         System.out.println("auchan filling complete");
-//        statement.close();
-//        connection.close();
     }
 }

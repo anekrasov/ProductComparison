@@ -14,10 +14,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class MetroCC{
+public class MetroCC {
 
     String getMetroccCategoryTree = "https://api.metro-cc.ru/api/v1/C98BB1B547ECCC17D8AEBEC7116D6/57/categories/tree";
     static Gson gson = new Gson();
@@ -93,19 +94,25 @@ public class MetroCC{
     }
 
 
-    public void toDatabase()throws SQLException {
+    public void toDatabase() throws SQLException {
         Database database = new Database();
         Connection connection = database.getConn();
+        PreparedStatement psCategory = connection.prepareStatement("INSERT INTO metrocc_category (name,site_id) VALUES (?,?);");
+        PreparedStatement psProduct = connection.prepareStatement("INSERT INTO 'metrocc_product' ('name','id_category','price','price_opt', 'opt_count','packing') " +
+                "VALUES (?,?,?,?,?,?);");
         Statement statement;
         statement = connection.createStatement();
         statement.execute("DELETE FROM metrocc_category;");
         statement.execute("DELETE FROM metrocc_product;");
+        connection.commit();
         JsonObject jsonObjectCategory = gson.fromJson(getHttpResponse(getMetroccCategoryTree), JsonObject.class);
         for (JsonElement o : jsonObjectCategory.get("data").getAsJsonArray()) {
             for (JsonElement subCategory : o.getAsJsonObject().get("childs").getAsJsonArray()) {
                 String name = subCategory.getAsJsonObject().get("name").toString().toLowerCase();
                 String id = subCategory.getAsJsonObject().get("id").toString();
-                statement.execute("INSERT INTO 'metrocc_category' ('name','site_id') VALUES ('" + name + "','" + id + "');");
+                psCategory.setString(1, name);
+                psCategory.setString(2, id);
+                psCategory.addBatch();
                 JsonObject jsonObjectProduct = null;
                 try {
                     jsonObjectProduct = getProduct(id);
@@ -114,18 +121,22 @@ public class MetroCC{
                 }
                 if (jsonObjectProduct != null) {
                     JsonArray jsonArray = jsonObjectProduct.get("data").getAsJsonObject().get("data").getAsJsonArray();
-                    jsonArrayToDatabase(jsonArray, statement);
+                    jsonArrayToDatabase(jsonArray, psProduct);
                 } else {
                     try {
                         JsonArray subLevel2 = subCategory.getAsJsonObject().get("childs").getAsJsonArray();
                         for (JsonElement sl2 : subLevel2) {
                             String subLevel2name = sl2.getAsJsonObject().get("name").toString().toLowerCase();
                             String subLevel2id = sl2.getAsJsonObject().get("id").toString();
-                            statement.execute("INSERT INTO 'metrocc_category' ('name','site_id') VALUES ('" + subLevel2name + "','" + subLevel2id + "');");
+                            psCategory.setString(1, subLevel2name);
+                            psCategory.setString(2, subLevel2id);
+                            psCategory.addBatch();
                             jsonObjectProduct = getProduct(subLevel2id);
                             if (jsonObjectProduct != null) {
                                 JsonArray jsonArray = jsonObjectProduct.get("data").getAsJsonObject().get("data").getAsJsonArray();
-                                jsonArrayToDatabase(jsonArray, statement);
+                                psCategory.executeBatch();
+                                connection.commit();
+                                jsonArrayToDatabase(jsonArray, psProduct);
                             }
                         }
                     } catch (NullPointerException e) {
@@ -134,12 +145,13 @@ public class MetroCC{
                 }
             }
         }
+        psCategory.executeBatch();
+        psProduct.executeBatch();
+        connection.commit();
         System.out.println("metrocc filling complate");
-//        statement.close();
-//        connection.close();
     }
 
-    public void jsonArrayToDatabase(JsonArray jsonArray, Statement statement) throws SQLException {
+    public void jsonArrayToDatabase(JsonArray jsonArray, PreparedStatement ps) throws SQLException {
         for (JsonElement jp : jsonArray) {
             String outOfStock = jp.getAsJsonObject().get("stock").getAsJsonObject().get("text").getAsString();
             if (!outOfStock.equals("Отсутствует")) {
@@ -147,27 +159,32 @@ public class MetroCC{
                 String categoryId = jp.getAsJsonObject().get("category_id").getAsString();
                 String price = jp.getAsJsonObject().get("prices").getAsJsonObject().get("price").getAsString();
                 String packing = jp.getAsJsonObject().get("packing").getAsJsonObject().get("type").getAsString();
-                String sql =
-                        "INSERT INTO 'metrocc_product' ('name','id_category','price','packing') VALUES ('" + nameProduct
-                                + "','" + categoryId + "','" + price + "','" + packing + "');";
+                ps.setString(1, nameProduct);
+                ps.setString(2, categoryId);
+                ps.setString(3, price);
+                ps.setString(6, packing);
+                ps.addBatch();
+                JsonArray priceLevels = null;
                 try {
-                    JsonArray priceLevels = jp.getAsJsonObject().get("prices").getAsJsonObject().get("levels").getAsJsonArray();
-                    if (priceLevels != null) {
-                        String priceOpt;
-                        for (JsonElement priceopt : priceLevels) {
-                            String count = priceopt.getAsJsonObject().get("count").toString();
-                            priceOpt = priceopt.getAsJsonObject().get("price").toString();
-                            String sql_opt =
-                                    "INSERT INTO 'metrocc_product' ('name','id_category','price','price_opt', 'opt_count','packing') " +
-                                            "VALUES ('" + nameProduct + "','" + categoryId + "','" + price + "','" + priceOpt + "','" + count + "','" + packing + "');";
-                            statement.execute(sql_opt);
-                        }
+                    priceLevels = jp.getAsJsonObject().get("prices").getAsJsonObject().get("levels").getAsJsonArray();
+                } catch (NullPointerException e) {
+//                    System.out.println("Товар "+ nameProduct+" не отптовый");
+                }
+                if (priceLevels != null) {
+                    for (JsonElement priceopt : priceLevels) {
+                        String count = priceopt.getAsJsonObject().get("count").toString();
+                        String priceOpt = priceopt.getAsJsonObject().get("price").toString();
+                        ps.setString(1, nameProduct);
+                        ps.setString(2, categoryId);
+                        ps.setString(3, price);
+                        ps.setString(4, priceOpt);
+                        ps.setString(5, count);
+                        ps.setString(6, packing);
+                        ps.addBatch();
                     }
-                } catch (Exception e) {
-                    statement.execute(sql);
                 }
             }
         }
+        ps.executeBatch();
     }
-
 }

@@ -18,6 +18,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -125,27 +126,34 @@ public class Lenta {
         String code;
         JsonObject dataMenu = getJsonDataMenu();
         JsonArray allCategoryProduct = getCategoryProduct(dataMenu);
+        PreparedStatement psCategory = connection.prepareStatement("INSERT INTO 'lenta_category' ('name', 'code') VALUES (?,?);");
+        PreparedStatement psProduct = connection.prepareStatement("INSERT INTO 'lenta_product' ('name', 'price','price_card','category','sub_name') VALUES (?,?,?,?,?);");
         statement.execute("DELETE FROM lenta_category;");
         statement.execute("DELETE FROM lenta_product;");
+        connection.commit();
         for (JsonElement o: allCategoryProduct) {
             name = o.getAsJsonObject().get("name").toString();
             code = o.getAsJsonObject().get("code").toString();
-            String sql = "INSERT INTO 'lenta_category' ('name', 'code') VALUES ('"+name+"', "+code+");";
+            psCategory.setString(1,name);
+            psCategory.setString(2,code);
+            psCategory.addBatch();
             JsonObject product = getProduct(code);
-            statement.execute(sql);
             for (JsonElement p: product.getAsJsonArray("skus") ) {
                 String title = p.getAsJsonObject().get("title").toString().replace("'","").toLowerCase();
                 String regularPrice = p.getAsJsonObject().get("regularPrice").getAsJsonObject().get("value").toString();
                 String cardPrice = p.getAsJsonObject().get("cardPrice").getAsJsonObject().get("value").toString();
                 String subTitle = p.getAsJsonObject().get("subTitle").toString().toLowerCase();
-                String sqlproduct = "INSERT INTO 'lenta_product' ('name', 'price','price_card','category','sub_name') " +
-                        "VALUES ('"+title+"', "+regularPrice+","+cardPrice+","+name+","+subTitle+");";
-                statement.execute(sqlproduct);
-
+                psProduct.setString(1,title);
+                psProduct.setString(2,regularPrice);
+                psProduct.setString(3,cardPrice);
+                psProduct.setString(4,name);
+                psProduct.setString(5,subTitle);
+                psProduct.addBatch();
             }
         }
+        psCategory.executeBatch();
+        psProduct.executeBatch();
+        connection.commit();
         System.out.println("lenta filling complate");
-//        statement.close();
-//        connection.close();
     }
 }
