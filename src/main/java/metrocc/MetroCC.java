@@ -134,8 +134,6 @@ public class MetroCC {
                             jsonObjectProduct = getProduct(subLevel2id);
                             if (jsonObjectProduct != null) {
                                 JsonArray jsonArray = jsonObjectProduct.get("data").getAsJsonObject().get("data").getAsJsonArray();
-                                psCategory.executeBatch();
-                                connection.commit();
                                 jsonArrayToDatabase(jsonArray, psProduct);
                             }
                         }
@@ -159,18 +157,8 @@ public class MetroCC {
                 String categoryId = jp.getAsJsonObject().get("category_id").getAsString();
                 String price = jp.getAsJsonObject().get("prices").getAsJsonObject().get("price").getAsString();
                 String packing = jp.getAsJsonObject().get("packing").getAsJsonObject().get("type").getAsString();
-                ps.setString(1, nameProduct);
-                ps.setString(2, categoryId);
-                ps.setString(3, price);
-                ps.setString(6, packing);
-                ps.addBatch();
-                JsonArray priceLevels = null;
                 try {
-                    priceLevels = jp.getAsJsonObject().get("prices").getAsJsonObject().get("levels").getAsJsonArray();
-                } catch (NullPointerException e) {
-//                    System.out.println("Товар "+ nameProduct+" не отптовый");
-                }
-                if (priceLevels != null) {
+                    JsonArray priceLevels = jp.getAsJsonObject().get("prices").getAsJsonObject().get("levels").getAsJsonArray();
                     for (JsonElement priceopt : priceLevels) {
                         String count = priceopt.getAsJsonObject().get("count").toString();
                         String priceOpt = priceopt.getAsJsonObject().get("price").toString();
@@ -182,9 +170,15 @@ public class MetroCC {
                         ps.setString(6, packing);
                         ps.addBatch();
                     }
+                } catch (NullPointerException e) {
+                    ps.setString(1, nameProduct);
+                    ps.setString(2, categoryId);
+                    ps.setString(3, price);
+                    ps.setString(6, packing);
+                    ps.addBatch();
+//                    System.out.println("Товар "+ nameProduct+" не отптовый");
                 }
             }
         }
-        ps.executeBatch();
     }
 }
