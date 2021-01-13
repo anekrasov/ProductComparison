@@ -8,7 +8,9 @@ import static spark.Spark.post;
 public class MainApp {
     public static void main(String[] args) {
         System.out.println("load.....");
-//        FillingDatabase.filling();
+        FillingDatabase.filling();
+        FillingDatabase.service();
+        System.out.println("service run");
         get("/", (req, res) -> Web.getPage("base.html"));
         get("/comparison", (req, res) -> Web.getPage("comparison.html"));
         get("/search", (req, res) -> "search!!");
@@ -45,9 +47,9 @@ public class MainApp {
             return Web.getPage("comparison.html", lenta, auchan, metrocc);
         });
 
-        get("/filling", (req, res) -> {
-            FillingDatabase.filling();
-            return Web.getPage("fillingPage.html");
-        });
+//        get("/filling", (req, res) -> {
+//            FillingDatabase.filling();
+//            return Web.getPage("fillingPage.html");
+//        });
     }
 }
