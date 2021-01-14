@@ -6,11 +6,7 @@ import static spark.Spark.*;
 
 public class MainApp {
     public static void main(String[] args) {
-        final String portNumber = System.getenv("PORT");
-
-        if (portNumber != null) {
-            port(Integer.parseInt(portNumber));
-        }
+        port(getHerokuAssignedPort());
         System.out.println("load.....");
 //        FillingDatabase.filling();
 //        FillingDatabase.service();
@@ -56,4 +52,11 @@ public class MainApp {
             return Web.getPage("fillingPage.html");
         });
     }
+    static int getHerokuAssignedPort() {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        if (processBuilder.environment().get("PORT") != null) {
+            return Integer.parseInt(processBuilder.environment().get("PORT"));
+        }
+        return 4567;
+}
 }
