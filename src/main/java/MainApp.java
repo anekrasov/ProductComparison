@@ -2,11 +2,15 @@ import web.Web;
 
 import java.sql.ResultSet;
 
-import static spark.Spark.get;
-import static spark.Spark.post;
+import static spark.Spark.*;
 
 public class MainApp {
     public static void main(String[] args) {
+        final String portNumber = System.getenv("PORT");
+
+        if (portNumber != null) {
+            port(Integer.parseInt(portNumber));
+        }
         System.out.println("load.....");
 //        FillingDatabase.filling();
 //        FillingDatabase.service();
