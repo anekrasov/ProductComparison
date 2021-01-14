@@ -20,7 +20,7 @@ import java.util.HashMap;
 
 public class Auchan {
 
-    String auchansiteCategoryes = "https://www.auchan.ru/v1/categories/?merchant_id=65";
+    final String auchansiteCategoryes = "https://www.auchan.ru/v1/categories/?merchant_id=65";
 
 
     public String getHttpResponse(String url){

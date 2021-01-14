@@ -20,8 +20,8 @@ import java.sql.Statement;
 
 public class MetroCC {
 
-    String getMetroccCategoryTree = "https://api.metro-cc.ru/api/v1/C98BB1B547ECCC17D8AEBEC7116D6/57/categories/tree";
-    static Gson gson = new Gson();
+    final String getMetroccCategoryTree = "https://api.metro-cc.ru/api/v1/C98BB1B547ECCC17D8AEBEC7116D6/57/categories/tree";
+    static final Gson gson = new Gson();
 
     public static String getHttpResponse(String url) {
         StringBuilder jsonString = new StringBuilder();
