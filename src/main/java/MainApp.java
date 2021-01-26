@@ -12,7 +12,6 @@ public class MainApp {
         Database.createTables();
 //        FillingDatabase.filling();
         FillingDatabase.service();
-        System.out.println("service run");
         get("/", (req, res) -> Web.getPage("base.html"));
         get("/comparison", (req, res) -> Web.getPage("comparison.html"));
         get("/search", (req, res) -> "search!!");
@@ -49,10 +48,10 @@ public class MainApp {
             return Web.getPage("comparison.html", lenta, auchan, metrocc);
         });
         get("/status",(req,res) -> {
-            String auchanLastDateUpdate = Status.getLastDataUpdate("auchanLastUpdateData").toString();
-            String lentaLastDateUpdate = Status.getLastDataUpdate("lentaLastUpdateData").toString();
-            String metroccLastDateUpdate = Status.getLastDataUpdate("metroccLastUpdateData").toString();
-            return Web.getPage("status.html");
+            String auchanLastDateUpdate = Status.getLastDataUpdate("auchan").getString("lastDateUpdate");
+            String lentaLastDateUpdate = Status.getLastDataUpdate("lenta").getString("lastDateUpdate");
+            String metroccLastDateUpdate = Status.getLastDataUpdate("metrocc").getString("lastDateUpdate");
+            return Web.getPage("status.html",lentaLastDateUpdate, auchanLastDateUpdate,metroccLastDateUpdate);
         });
         get("/filling", (req, res) -> {
             FillingDatabase.filling();

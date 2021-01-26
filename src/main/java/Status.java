@@ -11,7 +11,7 @@ public class Status {
         ResultSet result = null;
         final String auchan = "auchan";
         final String lenta = "lenta";
-        final String metrocc = "mentrocc";
+        final String metrocc = "metrocc";
         Database database = new Database();
         Connection connection = database.getConn();
         Statement statement = connection.createStatement();

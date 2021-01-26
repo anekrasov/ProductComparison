@@ -16,7 +16,9 @@ public class FillingDatabase {
 
         Thread thread1 = new Thread(() -> {
             try {
+                System.out.println("auchan service Start");
                 auchan.toDatabase();
+                System.out.println("auchan service Stop");
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
@@ -24,7 +26,9 @@ public class FillingDatabase {
 
         Thread thread2 = new Thread(() -> {
             try {
+                System.out.println("lenta service Start");
                 lenta.toDatabase();
+                System.out.println("lenta service Stop");
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
@@ -32,7 +36,9 @@ public class FillingDatabase {
 
         Thread thread3 = new Thread(() -> {
             try {
+                System.out.println("metroCC service Start");
                 metroCC.toDatabase();
+                System.out.println("metroCC service Stop");
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
@@ -45,36 +51,11 @@ public class FillingDatabase {
 
     public static void service(){
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        Auchan auchan = new Auchan();
-        Lenta lenta = new Lenta();
-        MetroCC metroCC = new MetroCC();
 
-        Thread thread1 = new Thread(() -> {
-            try {
-                auchan.toDatabase();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
+        Thread schedule_service_run = new Thread(() -> {
+            System.out.println("Schedule service run");
+            filling();
         });
-
-        Thread thread2 = new Thread(() -> {
-            try {
-                lenta.toDatabase();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-        });
-
-        Thread thread3 = new Thread(() -> {
-            try {
-                metroCC.toDatabase();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-        });
-        service.scheduleWithFixedDelay(thread1,0,10, TimeUnit.MINUTES);
-        service.scheduleWithFixedDelay(thread2,0,10, TimeUnit.MINUTES);
-        service.scheduleWithFixedDelay(thread3,0,10, TimeUnit.MINUTES);
-
+        service.scheduleWithFixedDelay(schedule_service_run,0,10, TimeUnit.MINUTES);
     }
 }
