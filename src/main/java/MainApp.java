@@ -1,10 +1,7 @@
-import com.lenta.Lenta;
 import database.Database;
-import ru.auchan.Auchan;
 import web.Web;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import static spark.Spark.*;
 
