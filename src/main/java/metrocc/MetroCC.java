@@ -13,10 +13,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class MetroCC {
 
@@ -145,6 +142,8 @@ public class MetroCC {
         }
         psCategory.executeBatch();
         psProduct.executeBatch();
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        statement.execute("UPDATE auchan_status SET lastDateUpdate="+"\""+timestamp+"\";");
         connection.commit();
         System.out.println("metrocc filling complate");
     }

@@ -17,10 +17,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class Lenta {
     Document doc = null;
@@ -153,6 +150,8 @@ public class Lenta {
         }
         psCategory.executeBatch();
         psProduct.executeBatch();
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        statement.execute("UPDATE lenta_status SET lastDateUpdate="+"\""+timestamp+"\";");
         connection.commit();
         System.out.println("lenta filling complate");
     }

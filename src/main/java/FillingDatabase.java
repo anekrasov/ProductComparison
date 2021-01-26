@@ -72,9 +72,9 @@ public class FillingDatabase {
                 throwables.printStackTrace();
             }
         });
-        service.scheduleWithFixedDelay(thread1,0,3, TimeUnit.HOURS);
-        service.scheduleWithFixedDelay(thread2,0,3, TimeUnit.HOURS);
-        service.scheduleWithFixedDelay(thread3,0,3, TimeUnit.HOURS);
+        service.scheduleWithFixedDelay(thread1,0,10, TimeUnit.MINUTES);
+        service.scheduleWithFixedDelay(thread2,0,10, TimeUnit.MINUTES);
+        service.scheduleWithFixedDelay(thread3,0,10, TimeUnit.MINUTES);
 
     }
 }

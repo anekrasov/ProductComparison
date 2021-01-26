@@ -1,5 +1,5 @@
 # Project exclude paths
 /target/
 .idea/
-product
+product.db3
 dependency-reduced-pom.xml
