@@ -146,19 +146,6 @@ public class MetroCC {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         statement.execute("UPDATE metrocc_status SET lastDateUpdate="+"\""+timestamp+"\";");
         Database.commit(connection);
-//        try {
-//            connection.commit();
-//        }
-//        catch (SQLException ex){
-//            try {
-//                System.out.println("запись в базу Metro не удалась ");
-//                Thread.sleep(3000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//            System.out.println("Повтор записи в базу MetroCC");
-//            connection.commit();
-//        }
         System.out.println("metrocc filling complate");
     }
 
