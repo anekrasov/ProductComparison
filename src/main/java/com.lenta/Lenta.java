@@ -128,19 +128,7 @@ public class Lenta {
         PreparedStatement psProduct = connection.prepareStatement("INSERT INTO 'lenta_product' ('name', 'price','price_card','category','sub_name') VALUES (?,?,?,?,?);");
         statement.execute("DELETE FROM lenta_category;");
         statement.execute("DELETE FROM lenta_product;");
-        try {
-            connection.commit();
-        }
-        catch (SQLiteException exception)
-                {
-                    System.out.println("Ждем запись в базу, таблица Lenta");
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    connection.commit();
-                }
+        Database.commit(connection);
 
         for (JsonElement o: allCategoryProduct) {
             name = o.getAsJsonObject().get("name").toString();

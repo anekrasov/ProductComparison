@@ -102,19 +102,7 @@ public class MetroCC {
         statement = connection.createStatement();
         statement.execute("DELETE FROM metrocc_category;");
         statement.execute("DELETE FROM metrocc_product;");
-        try {
-            connection.commit();
-        }
-        catch (SQLiteException exception)
-        {
-            System.out.println("Ждем запись в базу, таблица metro");
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            connection.commit();
-        }
+        Database.commit(connection);
         JsonObject jsonObjectCategory = gson.fromJson(getHttpResponse(getMetroccCategoryTree), JsonObject.class);
         for (JsonElement o : jsonObjectCategory.get("data").getAsJsonArray()) {
             for (JsonElement subCategory : o.getAsJsonObject().get("childs").getAsJsonArray()) {

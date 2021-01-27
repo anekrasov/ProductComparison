@@ -107,19 +107,7 @@ public class Auchan {
         PreparedStatement psProduct = connection.prepareStatement("INSERT INTO auchan_product (name,price,category) VALUES (?, ?, ?);");
         statement.execute("DELETE FROM auchan_category;");
         statement.execute("DELETE FROM auchan_product;");
-        try {
-            connection.commit();
-        }
-        catch (SQLiteException exception)
-        {
-            System.out.println("Ждем запись в базу, таблица auchan");
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            connection.commit();
-        }
+        Database.commit(connection);
         for (String category: mapAuchan.keySet()) {
             cat = category;
             try {
@@ -144,18 +132,6 @@ public class Auchan {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         statement.execute("UPDATE auchan_status SET lastDateUpdate="+"\""+timestamp+"\";");
         Database.commit(connection);
-//        try {
-//            connection.commit();
-//        }
-//        catch (SQLException ex){
-//            try {
-//                Thread.sleep(3000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//            System.out.println("Повтор записи в базу Auchan");
-//            connection.commit();
-//        }
         System.out.println("auchan filling complete");
     }
 }
