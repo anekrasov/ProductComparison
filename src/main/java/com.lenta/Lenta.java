@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import database.Database;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.sqlite.SQLiteException;
 import web.UserAgent;
 
 import java.io.BufferedReader;
@@ -127,7 +128,20 @@ public class Lenta {
         PreparedStatement psProduct = connection.prepareStatement("INSERT INTO 'lenta_product' ('name', 'price','price_card','category','sub_name') VALUES (?,?,?,?,?);");
         statement.execute("DELETE FROM lenta_category;");
         statement.execute("DELETE FROM lenta_product;");
-        connection.commit();
+        try {
+            connection.commit();
+        }
+        catch (SQLiteException exception)
+                {
+                    System.out.println("Ждем запись в базу, таблица Lenta");
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    connection.commit();
+                }
+
         for (JsonElement o: allCategoryProduct) {
             name = o.getAsJsonObject().get("name").toString();
             code = o.getAsJsonObject().get("code").toString();
@@ -152,7 +166,20 @@ public class Lenta {
         psProduct.executeBatch();
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         statement.execute("UPDATE lenta_status SET lastDateUpdate="+"\""+timestamp+"\";");
-        connection.commit();
+        Database.commit(connection);
+//        try {
+//            connection.commit();
+//        }
+//        catch (SQLException ex){
+//            try {
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            System.out.println("Повтор записи в базу Lenta");
+//            connection.commit();
+//        }
         System.out.println("lenta filling complate");
     }
+
 }

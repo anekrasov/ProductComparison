@@ -1,3 +1,5 @@
+package database;
+
 import com.lenta.Lenta;
 import metrocc.MetroCC;
 import ru.auchan.Auchan;
@@ -51,11 +53,10 @@ public class FillingDatabase {
 
     public static void service(){
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-
         Thread schedule_service_run = new Thread(() -> {
             System.out.println("Schedule service run");
             filling();
         });
-        service.scheduleWithFixedDelay(schedule_service_run,0,40, TimeUnit.MINUTES);
+        service.scheduleWithFixedDelay(schedule_service_run,0,4, TimeUnit.HOURS);
     }
 }

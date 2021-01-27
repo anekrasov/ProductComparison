@@ -22,10 +22,7 @@ public class Database {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:product.db3");
             conn.setAutoCommit(false);
-//            System.out.println("База Подключена!");
-//            createTables();
         }catch (Exception e){
-//            System.out.println("База не подключена");
             e.printStackTrace();
         }
     }
@@ -35,8 +32,7 @@ public class Database {
         return conn;
     }
 
-    public static void createTables()
-    {
+    public static void createTables(){
         conn();
         ClassLoader classLoader = Web.class.getClassLoader();
         File file = new File(Objects.requireNonNull(classLoader.getResource("product.sql")).getFile());
@@ -49,14 +45,18 @@ public class Database {
             }
             conn.commit();
         } catch (IOException | SQLException ignored) {
+            System.out.println("ошибка создания базы");
         }
         try {
             statmt.close();
             conn.close();
+            System.out.println("Таблицы созданы или уже существует.");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        System.out.println("Таблицы созданы или уже существует.");
+    }
+    synchronized public static void commit(Connection connection) throws SQLException {
+        connection.commit();
     }
 }
 

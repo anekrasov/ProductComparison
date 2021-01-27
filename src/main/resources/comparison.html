@@ -4,79 +4,43 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href=" https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net/1.10.23/jquery.dataTables.min.js"></script>
 
     <title>Comparison</title>
 </head>
 <body>
 <div class="container-fluid">
     <h1 class="text-center">Comparison product</h1>
-    <form class="text-center" action="/search" method="POST">
-        <div>
+    <form class="text-center " action="/search" method="POST">
+        <div class="form-group">
             <input name="text" class="text-center w-75" id="name" placeholder="Название">
+            <button type="submit" class="btn btn-primary mb-2 text-center">Поиск</button>
         </div>
-        <div>
-            <button class="btn btn-primary mb-2 text-center">Поиск</button>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="lenta" checked>
+            <label class="form-check-label" for="inlineCheckbox1">Lenta</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="inlineCheckbox2" name="auchan" checked>
+            <label class="form-check-label" for="inlineCheckbox2">Auchan</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="inlineCheckbox3" name="metro" checked>
+            <label class="form-check-label" for="inlineCheckbox3">Metro</label>
         </div>
     </form>
     <div class="row">
-        <div class="col-sm">
-            <p class="text-center smal">Lenta</p>
-            <table class="table table-sm">
-                <thead>
-                <tr>
-                    <th scope="col">Наименование</th>
-                    <th scope="col">Цена</th>
-                    <th scope="col">С картой</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    %lenta%
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="col-sm">
-            <p class="text-center">Auchan</p>
-            <table class="table table-sm">
-                <tr>
-                    <th class="">Наименование</th>
-                    <th class="">Цена</th>
-                </tr>
-                 <tbody>
-                <tr>
-                    %auchan%
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="col-sm">
-            <p class="text-center">Metro-CC</p>
-            <table class="table table-sm">
-                <tr>
-                    <th class="">Наименование</th>
-                    <th class="">Цена</th>
-                    <th class="">Оптовая цена</th>
-                    <th class="">Опт от</th>
-
-                </tr>
-                 <tbody>
-                <tr>
-                    %metrocc%
-                </tr>
-                </tbody>
-            </table>
-        </div>
+        %lenta_table%
+        %auchan_table%
+        %metrocc_table%
     </div>
 </div>
-
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+</body>
+<!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"-->
+<!--        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
         integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
@@ -87,5 +51,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net/1.10.23/jquery.dataTables.min.js"
         integrity="sha512-coE8Qg+5Eb8e0xSXkdSJYln78NclTBgX6rducQWvi3NZooVaR1GVcVA5fRPVetzSqh9CEBv7hzwuQsZLLC0e8g=="
         crossorigin="anonymous"></script>
-</body>
+<script>
+    $(document).ready(function() {$('#lenta_table').DataTable();});
+    $(document).ready(function() {$('#auchan_table').DataTable();});
+    $(document).ready(function() {$('#metrocc_table').DataTable();});
+</script>
 </html>

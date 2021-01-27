@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import database.Database;
+import org.sqlite.SQLiteException;
 import web.UserAgent;
 
 import java.io.BufferedReader;
@@ -101,7 +102,19 @@ public class MetroCC {
         statement = connection.createStatement();
         statement.execute("DELETE FROM metrocc_category;");
         statement.execute("DELETE FROM metrocc_product;");
-        connection.commit();
+        try {
+            connection.commit();
+        }
+        catch (SQLiteException exception)
+        {
+            System.out.println("Ждем запись в базу, таблица metro");
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            connection.commit();
+        }
         JsonObject jsonObjectCategory = gson.fromJson(getHttpResponse(getMetroccCategoryTree), JsonObject.class);
         for (JsonElement o : jsonObjectCategory.get("data").getAsJsonArray()) {
             for (JsonElement subCategory : o.getAsJsonObject().get("childs").getAsJsonArray()) {
@@ -143,8 +156,21 @@ public class MetroCC {
         psCategory.executeBatch();
         psProduct.executeBatch();
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        statement.execute("UPDATE auchan_status SET lastDateUpdate="+"\""+timestamp+"\";");
-        connection.commit();
+        statement.execute("UPDATE metrocc_status SET lastDateUpdate="+"\""+timestamp+"\";");
+        Database.commit(connection);
+//        try {
+//            connection.commit();
+//        }
+//        catch (SQLException ex){
+//            try {
+//                System.out.println("запись в базу Metro не удалась ");
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            System.out.println("Повтор записи в базу MetroCC");
+//            connection.commit();
+//        }
         System.out.println("metrocc filling complate");
     }
 

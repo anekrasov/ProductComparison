@@ -5,8 +5,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import database.Database;
+import org.sqlite.SQLiteException;
 import web.UserAgent;
 
+import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -105,7 +107,19 @@ public class Auchan {
         PreparedStatement psProduct = connection.prepareStatement("INSERT INTO auchan_product (name,price,category) VALUES (?, ?, ?);");
         statement.execute("DELETE FROM auchan_category;");
         statement.execute("DELETE FROM auchan_product;");
-        connection.commit();
+        try {
+            connection.commit();
+        }
+        catch (SQLiteException exception)
+        {
+            System.out.println("Ждем запись в базу, таблица auchan");
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            connection.commit();
+        }
         for (String category: mapAuchan.keySet()) {
             cat = category;
             try {
@@ -129,7 +143,19 @@ public class Auchan {
         psProduct.executeBatch();
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         statement.execute("UPDATE auchan_status SET lastDateUpdate="+"\""+timestamp+"\";");
-        connection.commit();
+        Database.commit(connection);
+//        try {
+//            connection.commit();
+//        }
+//        catch (SQLException ex){
+//            try {
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            System.out.println("Повтор записи в базу Auchan");
+//            connection.commit();
+//        }
         System.out.println("auchan filling complete");
     }
 }
