@@ -8,7 +8,6 @@ import com.google.gson.JsonObject;
 import database.Database;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.sqlite.SQLiteException;
 import web.UserAgent;
 
 import java.io.BufferedReader;
@@ -89,11 +88,10 @@ public class Lenta {
 
     public String getHttpRequest(String payload){
         StringBuilder jsonString = new StringBuilder();
-        String userAgent = UserAgent.getRandomUserAgent();
         try {
             URL apiurl = new URL("https://lenta.com/api/v1/skus/list");
             HttpURLConnection connection = (HttpURLConnection) apiurl.openConnection();
-            connection.setRequestProperty("User-Agent", userAgent);
+            connection.setRequestProperty("User-Agent", UserAgent.getRandomUserAgent());
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Accept", "application/json");
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");

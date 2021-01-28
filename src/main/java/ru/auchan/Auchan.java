@@ -5,17 +5,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import database.Database;
-import org.sqlite.SQLiteException;
 import web.UserAgent;
 
-import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.*;
-import java.util.Date;
 import java.util.HashMap;
 
 public class Auchan {
@@ -25,11 +22,10 @@ public class Auchan {
 
     public static String getHttpResponse(String url){
         StringBuilder jsonString = new StringBuilder();
-        String userAgent = UserAgent.getRandomUserAgent();
         try {
             URL apiurl = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) apiurl.openConnection();
-            connection.setRequestProperty("User-Agent", userAgent);
+            connection.setRequestProperty("User-Agent", UserAgent.getRandomUserAgent());
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/json");
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -42,6 +38,7 @@ public class Auchan {
                 System.out.println("Auchan Thread sleep 60 sec");
                 Thread.sleep(60000);
                 System.out.println("resend");
+                connection.setRequestProperty("User-Agent", UserAgent.getRandomUserAgent());
                 inputStreamReader = new InputStreamReader(connection.getInputStream());
             }
             BufferedReader br = new BufferedReader(inputStreamReader);
@@ -64,6 +61,7 @@ public class Auchan {
         category = getItems(jsonArray);
         return category;
     }
+
     public static HashMap<String,String> getItems(JsonArray jsonArray){
         HashMap <String,String> result = new HashMap<>();
         String nameCategory = null;

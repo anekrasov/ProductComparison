@@ -6,7 +6,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import database.Database;
-import org.sqlite.SQLiteException;
 import web.UserAgent;
 
 import java.io.BufferedReader;
@@ -23,11 +22,10 @@ public class MetroCC {
 
     public static String getHttpResponse(String url) {
         StringBuilder jsonString = new StringBuilder();
-        String userAgent = UserAgent.getRandomUserAgent();
         try {
             URL apiurl = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) apiurl.openConnection();
-            connection.setRequestProperty("User-Agent", userAgent);
+            connection.setRequestProperty("User-Agent", UserAgent.getRandomUserAgent());
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/json");
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -40,6 +38,7 @@ public class MetroCC {
                 System.out.println("MetroCC Thread sleep 60 sec");
                 Thread.sleep(60000);
                 System.out.println("resend");
+                connection.setRequestProperty("User-Agent", UserAgent.getRandomUserAgent());
                 inputStreamReader = new InputStreamReader(connection.getInputStream());
             }
             BufferedReader br = new BufferedReader(inputStreamReader);
