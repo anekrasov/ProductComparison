@@ -20,10 +20,10 @@ import java.util.HashMap;
 
 public class Auchan {
 
-    final String auchansiteCategoryes = "https://www.auchan.ru/v1/categories/?merchant_id=65";
+    static String url = "https://www.auchan.ru/v1/categories/?merchant_id=65";
 
 
-    public String getHttpResponse(String url){
+    public static String getHttpResponse(String url){
         StringBuilder jsonString = new StringBuilder();
         String userAgent = UserAgent.getRandomUserAgent();
         try {
@@ -58,30 +58,49 @@ public class Auchan {
         return String.valueOf(jsonString);
     }
 
-    public HashMap<String,String> generateUrl(){
-        HashMap<String,String> category = new HashMap<>();
-        JsonArray jsonArray = new Gson().fromJson(getHttpResponse(auchansiteCategoryes),JsonArray.class);
-        for (JsonElement o: jsonArray) {
-            String nameCategory = o.getAsJsonObject().get("name").toString();
-            String codeCatecory = o.getAsJsonObject().get("code").toString().replace("\"","");
-            String productsCountcodeCategory = o.getAsJsonObject().get("productsCount").toString().replace("\"","");
-            JsonArray items = o.getAsJsonObject().getAsJsonArray("items");
-            String urlsCategory = "https://www.auchan.ru/v1/catalog/products?merchantId=65&filter[category]="
-                    +codeCatecory+"&page=1&perPage="
-                    +productsCountcodeCategory+"&orderField=rank&orderDirection=asc";
-
-            category.put(nameCategory,urlsCategory);
-            for (JsonElement o2: items ) {
-                String nameSubcategory = o2.getAsJsonObject().get("name").toString().replace("\"","");
-                String codeSubcategory = o2.getAsJsonObject().get("code").toString().replace("\"","");
-                String productsCountcodeSubcategory = o2.getAsJsonObject().get("productsCount").toString().replace("\"","");
-                String urlsSubcategory = "https://www.auchan.ru/v1/catalog/products?merchantId=65&filter[category]="
-                        +codeSubcategory+"&page=1&perPage="
-                        +productsCountcodeSubcategory+"&orderField=rank&orderDirection=asc";
-                category.put(nameSubcategory,urlsSubcategory);
-            }
-        }
+    public static HashMap<String,String> generateUrl(){
+        HashMap<String,String> category;
+        JsonArray jsonArray = new Gson().fromJson(getHttpResponse(url),JsonArray.class);
+        category = getItems(jsonArray);
         return category;
+    }
+    public static HashMap<String,String> getItems(JsonArray jsonArray){
+        HashMap <String,String> result = new HashMap<>();
+        String nameCategory = null;
+        String codeCatecory;
+        String productsCountcodeCategory;
+        String url;
+        for (JsonElement items: jsonArray) {
+            JsonArray o2 = items.getAsJsonObject().getAsJsonArray("items");
+            for (JsonElement items2: o2) {
+                try {
+                    JsonArray o3 = items2.getAsJsonObject().getAsJsonArray("items");
+                    for (JsonElement items3: o3) {
+                        nameCategory = items3.getAsJsonObject().get("name").toString().replace("\"","");
+                        codeCatecory = items3.getAsJsonObject().get("code").toString().replace("\"","");
+                        productsCountcodeCategory = items3.getAsJsonObject().get("productsCount").toString().replace("\"","");
+                        url ="https://www.auchan.ru/v1/catalog/products?merchantId=65&filter[category]="
+                                +codeCatecory+"&page=1&perPage="+productsCountcodeCategory+"&orderField=rank&orderDirection=asc";
+                        result.put(nameCategory,url);
+                    }
+                }catch (Exception ex){
+                    System.out.println("нет категории (item3)" + nameCategory);
+                }
+                nameCategory = items2.getAsJsonObject().get("name").toString().replace("\"","");
+                codeCatecory = items2.getAsJsonObject().get("code").toString().replace("\"","");
+                productsCountcodeCategory = items2.getAsJsonObject().get("productsCount").toString().replace("\"","");
+                url ="https://www.auchan.ru/v1/catalog/products?merchantId=65&filter[category]="
+                        +codeCatecory+"&page=1&perPage="+productsCountcodeCategory+"&orderField=rank&orderDirection=asc";
+                result.put(nameCategory,url);
+            }
+            nameCategory = items.getAsJsonObject().get("name").toString().replace("\"","");
+            codeCatecory = items.getAsJsonObject().get("code").toString().replace("\"","");
+            productsCountcodeCategory = items.getAsJsonObject().get("productsCount").toString().replace("\"","");
+            url ="https://www.auchan.ru/v1/catalog/products?merchantId=65&filter[category]="
+                    +codeCatecory+"&page=1&perPage="+productsCountcodeCategory+"&orderField=rank&orderDirection=asc";
+            result.put(nameCategory,url);
+        }
+        return result;
     }
 
     public HashMap<String,String> getProduct(String url){

@@ -1,7 +1,5 @@
 package database;
 
-import database.Database;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,8 +12,7 @@ public class Status {
         final String auchan = "auchan";
         final String lenta = "lenta";
         final String metrocc = "metrocc";
-        Database database = new Database();
-        Connection connection = database.getConn();
+        Connection connection = new Database().getConn();
         Statement statement = connection.createStatement();
         switch (shop){
             case auchan:

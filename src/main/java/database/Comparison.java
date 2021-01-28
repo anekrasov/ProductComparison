@@ -17,7 +17,7 @@ public class Comparison {
         Database database = new Database();
         Connection connection = database.getConn();
         Statement statement = connection.createStatement();
-        String sql = "SELECT * FROM "+storeName+" WHERE \"name\" LIKE \"%"+name+"%\";";
+        String sql = "SELECT * FROM  "+storeName+" WHERE name LIKE \"%"+name+"%\";";
         return statement.executeQuery(sql);
     }
 }

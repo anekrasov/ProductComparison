@@ -13,9 +13,9 @@ public class MainApp {
     public static void main(String[] args) {
         port(getHerokuAssignedPort());
         System.out.println("load.....");
-        Database.createTables();
+//        Database.createTables();
 //        database.FillingDatabase.filling();
-        database.FillingDatabase.service();
+//        database.FillingDatabase.service();
         get("/", (req, res) -> Web.getPage("base.html"));
         get("/comparison", (req, res) -> Web.getPage("comparison.html"));
         get("/search", (req, res) -> "search!!");
@@ -78,7 +78,12 @@ public class MainApp {
             Database.createTables();
             return "Databse initial";
         });
+        get("/startService",(req,res)->{
+            FillingDatabase.service();
+            return "Service start";
+        });
         get("/testTable", (req,res)-> Web.getPage("testTable.html"));
+
     }
 
     static int getHerokuAssignedPort() {

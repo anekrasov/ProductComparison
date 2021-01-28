@@ -155,18 +155,6 @@ public class Lenta {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         statement.execute("UPDATE lenta_status SET lastDateUpdate="+"\""+timestamp+"\";");
         Database.commit(connection);
-//        try {
-//            connection.commit();
-//        }
-//        catch (SQLException ex){
-//            try {
-//                Thread.sleep(3000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//            System.out.println("Повтор записи в базу Lenta");
-//            connection.commit();
-//        }
         System.out.println("lenta filling complate");
     }
 
