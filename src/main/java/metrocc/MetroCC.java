@@ -46,6 +46,7 @@ public class MetroCC {
             connection.disconnect();
             return jsonString.toString();
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("MetroApi return error");
             if(connection!=null) connection.disconnect();
             System.out.println("MetroCC Thread sleep 2 min");

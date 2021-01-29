@@ -111,6 +111,7 @@ public class Lenta {
             connection.disconnect();
             return jsonString.toString();
         }catch (IOException e) {
+            e.printStackTrace();
             System.out.println("Lenta return error");
             if (connection != null) connection.disconnect();
             System.out.println("Letnta thread sleep 2 min");

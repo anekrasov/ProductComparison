@@ -46,6 +46,7 @@ public class Auchan {
             return jsonString.toString();
 
         }catch (Exception ex) {
+            ex.printStackTrace();
             System.out.println("Auchan return error");
             if (connection != null) {
                 connection.disconnect();

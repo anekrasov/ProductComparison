@@ -13,8 +13,8 @@ public class MainApp {
     public static void main(String[] args) {
         port(getHerokuAssignedPort());
         System.out.println("load.....");
-//        Database.createTables();
-//        database.FillingDatabase.filling();
+        Database.createTables();
+        database.FillingDatabase.filling();
 //        database.FillingDatabase.service();
         get("/", (req, res) -> Web.getPage("base.html"));
         get("/comparison", (req, res) -> Web.getPage("comparison.html"));
