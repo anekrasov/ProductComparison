@@ -5,12 +5,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import database.Database;
+import web.ConnectionToAPI;
 import web.UserAgent;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.*;
 import java.util.HashMap;
@@ -22,25 +24,18 @@ public class Auchan {
 
     public static String getHttpResponse(String url){
         StringBuilder jsonString = new StringBuilder();
+        HashMap<String,String> property = new HashMap<>();
+        property.put("userAgent",UserAgent.getRandomUserAgent());
+        property.put("MIME","application/json");
+        property.put("contentType","application/json; charset=UTF-8");
+        property.put("cookie","_GASHOP=069_Barnaul_Volna; merchantID_=69; region_id=25");
+        HttpURLConnection connection = null;
+        URL apiurl = null;
+        InputStreamReader inputStreamReader = null;
         try {
-            URL apiurl = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) apiurl.openConnection();
-            connection.setRequestProperty("User-Agent", UserAgent.getRandomUserAgent());
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-            connection.setRequestProperty("Cookie", "_GASHOP=069_Barnaul_Volna; merchantID_=69; region_id=25");
-            InputStreamReader inputStreamReader;
-            try {
-                inputStreamReader = new InputStreamReader(connection.getInputStream());
-            }catch (Exception e){
-                e.printStackTrace();
-                System.out.println("Auchan Thread sleep 60 sec");
-                Thread.sleep(60000);
-                System.out.println("resend");
-                connection.setRequestProperty("User-Agent", UserAgent.getRandomUserAgent());
-                inputStreamReader = new InputStreamReader(connection.getInputStream());
-            }
+            apiurl = new URL(url);
+            connection = new ConnectionToAPI("GET",property).getConnection(apiurl);
+            inputStreamReader = new InputStreamReader(connection.getInputStream());
             BufferedReader br = new BufferedReader(inputStreamReader);
             String line;
             while ((line = br.readLine()) != null) {
@@ -49,10 +44,57 @@ public class Auchan {
             br.close();
             connection.disconnect();
             return jsonString.toString();
-        }catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+
+        }catch (Exception ex) {
+            System.out.println("Auchan return error");
+            if (connection != null) {
+                connection.disconnect();
+            }
+            System.out.println("Auchan Thread sleep 2 min");
+            try {
+                Thread.sleep(120000);
+            } catch (InterruptedException interruptedException) {
+                interruptedException.printStackTrace();
+            }
+            System.out.println("resend");
+            try {
+                apiurl = new URL(url);
+            } catch (MalformedURLException malformedURLException) {
+                malformedURLException.printStackTrace();
+            }
+            if (apiurl != null) {
+                connection = new ConnectionToAPI("GET",property).getConnection(apiurl);
+            }
+            try {
+                if (connection != null) {
+                    inputStreamReader = new InputStreamReader(connection.getInputStream());
+                }
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+            BufferedReader br = null;
+            if (inputStreamReader != null) {
+                br = new BufferedReader(inputStreamReader);
+            }
+            String line = null;
+            while (true) {
+                try {
+                    if (br != null && (line = br.readLine()) == null) break;
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                }
+                jsonString.append(line);
+            }
+            try {
+                br.close();
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+            if (connection != null) {
+                connection.disconnect();
+            }
+            return jsonString.toString();
         }
-        return String.valueOf(jsonString);
     }
 
     public static HashMap<String,String> generateUrl(){

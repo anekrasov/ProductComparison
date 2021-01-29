@@ -6,14 +6,17 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import database.Database;
+import web.ConnectionToAPI;
 import web.UserAgent;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.sql.*;
+import java.util.HashMap;
 
 public class MetroCC {
 
@@ -22,25 +25,18 @@ public class MetroCC {
 
     public static String getHttpResponse(String url) {
         StringBuilder jsonString = new StringBuilder();
+        InputStreamReader inputStreamReader;
+        HashMap<String,String> property = new HashMap<>();
+        property.put("userAgent",UserAgent.getRandomUserAgent());
+        property.put("MIME","application/json");
+        property.put("contentType","application/json; charset=UTF-8");
+        property.put("cookie","metrostore=57; UserSettings=SelectedStore={6cfe3e81-a91d-44c0-a8b3-b41b4a2ff9a8};");
+        HttpURLConnection connection = null;
+        URL apiurl = null;
         try {
-            URL apiurl = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) apiurl.openConnection();
-            connection.setRequestProperty("User-Agent", UserAgent.getRandomUserAgent());
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-            connection.setRequestProperty("Cookie", "metrostore=57; UserSettings=SelectedStore={6cfe3e81-a91d-44c0-a8b3-b41b4a2ff9a8};");
-            InputStreamReader inputStreamReader;
-            try {
-                inputStreamReader = new InputStreamReader(connection.getInputStream());
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("MetroCC Thread sleep 60 sec");
-                Thread.sleep(60000);
-                System.out.println("resend");
-                connection.setRequestProperty("User-Agent", UserAgent.getRandomUserAgent());
-                inputStreamReader = new InputStreamReader(connection.getInputStream());
-            }
+            apiurl = new URL(url);
+            connection = new ConnectionToAPI("GET",property).getConnection(apiurl);
+            inputStreamReader = new InputStreamReader(connection.getInputStream());
             BufferedReader br = new BufferedReader(inputStreamReader);
             String line;
             while ((line = br.readLine()) != null) {
@@ -49,8 +45,34 @@ public class MetroCC {
             br.close();
             connection.disconnect();
             return jsonString.toString();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("MetroApi return error");
+            if(connection!=null) connection.disconnect();
+            System.out.println("MetroCC Thread sleep 2 min");
+            try {
+                Thread.sleep(120000);
+            } catch (InterruptedException interruptedException) {
+                interruptedException.printStackTrace();
+            }
+            System.out.println("resend");
+            if (apiurl != null) {
+                connection = new ConnectionToAPI("GET",property).getConnection(apiurl);
+            }
+            try {
+                if (connection != null) {
+                    inputStreamReader = new InputStreamReader(connection.getInputStream());
+                    BufferedReader br = new BufferedReader(inputStreamReader);
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        jsonString.append(line);
+                    }
+                    br.close();
+                    connection.disconnect();
+                    return jsonString.toString();
+                }
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
         }
         return String.valueOf(jsonString);
     }

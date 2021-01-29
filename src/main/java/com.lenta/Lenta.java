@@ -8,16 +8,15 @@ import com.google.gson.JsonObject;
 import database.Database;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import web.ConnectionToAPI;
 import web.UserAgent;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
+import java.util.HashMap;
 
 public class Lenta {
     Document doc = null;
@@ -88,16 +87,19 @@ public class Lenta {
 
     public String getHttpRequest(String payload){
         StringBuilder jsonString = new StringBuilder();
+        HashMap<String,String> property = new HashMap<>();
+        property.put("userAgent",UserAgent.getRandomUserAgent());
+        property.put("MIME","application/json");
+        property.put("contentType","application/json; charset=UTF-8");
+        property.put("cookie","lentaT2=brn; CityCookie=brn; ReviewedSkus=275922,291465,112117,275920;Stora=0083");
+        HttpURLConnection connection = null;
+        URL apiurl = null;
         try {
-            URL apiurl = new URL("https://lenta.com/api/v1/skus/list");
-            HttpURLConnection connection = (HttpURLConnection) apiurl.openConnection();
-            connection.setRequestProperty("User-Agent", UserAgent.getRandomUserAgent());
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-            connection.setRequestProperty("Cookie", "lentaT2=brn; CityCookie=brn; ReviewedSkus=275922,291465,112117,275920;Stora=0083");
+            apiurl = new URL("https://lenta.com/api/v1/skus/list");
+            connection = new ConnectionToAPI("POST",property).getConnection(apiurl);
             connection.setDoOutput(true);
-            OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), StandardCharsets.UTF_8);
+            OutputStream outputStream = connection.getOutputStream();
+            OutputStreamWriter writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
             writer.write(payload);
             writer.close();
             BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -109,9 +111,66 @@ public class Lenta {
             connection.disconnect();
             return jsonString.toString();
         }catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Lenta return error");
+            if (connection != null) connection.disconnect();
+            System.out.println("Letnta thread sleep 2 min");
+            try {
+                Thread.sleep(120000);
+            } catch (InterruptedException interruptedException) {
+                interruptedException.printStackTrace();
+            }
+            System.out.println("resend");
+            if (apiurl != null) {
+                connection = new ConnectionToAPI("POST",property).getConnection(apiurl);
+                connection.setDoOutput(true);
+            }
+            OutputStreamWriter writer = null;
+            try {
+                if (connection != null) {
+                    writer = new OutputStreamWriter(connection.getOutputStream(), StandardCharsets.UTF_8);
+                }
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+            try {
+                if (writer != null) {
+                    writer.write(payload);
+                }
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+            BufferedReader br = null;
+            try {
+                if (connection != null) {
+                    br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                }
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+            String line = null;
+            while (true) {
+                try {
+                    if (br != null && (line = br.readLine()) == null) break;
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                }
+                jsonString.append(line);
+            }
+            try {
+                br.close();
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+            connection.disconnect();
+            return jsonString.toString();
         }
-        return String.valueOf(jsonString);
     }
 
     public void toDatabase() throws SQLException {

@@ -57,6 +57,6 @@ public class FillingDatabase {
             System.out.println("Schedule service run");
             filling();
         });
-        service.scheduleWithFixedDelay(schedule_service_run,0,4, TimeUnit.HOURS);
+        service.scheduleWithFixedDelay(schedule_service_run,0,15, TimeUnit.MINUTES);
     }
 }
